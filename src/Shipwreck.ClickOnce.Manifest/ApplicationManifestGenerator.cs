@@ -215,12 +215,33 @@ public class ApplicationManifestGenerator : ManifestGenerator
         GenerateFrameworkDependencies();
     }
 
+    private AssemblyName GetAssemblyName(string fullFileName)
+    {
+        try
+        {
+            return AssemblyName.GetAssemblyName(fullFileName);
+        }
+        catch (BadImageFormatException)
+        {
+            //dotnet core winexe launcher
+            var libFullFile = fullFileName.Replace(".exe", ".dll");
+            if (File.Exists(libFullFile))
+            {
+                var name = AssemblyName.GetAssemblyName(libFullFile);
+                name.Name = fullFileName;
+                return name;
+            }
+
+            throw;
+        }
+    }
+    
     private void GenerateAssemblyIdentityElement()
     {
         if (EntryPointPath != null)
         {
             var fi = new FileInfo(Path.Combine(FromDirectory.FullName, EntryPointPath));
-            var name = AssemblyName.GetAssemblyName(fi.FullName);
+            var name = GetAssemblyName(fi.FullName);
 
             GetOrAddAssemblyIdentityElement(
                 name: Path.GetFileName(EntryPointPath.Replace('/', '\\')),
@@ -249,8 +270,8 @@ public class ApplicationManifestGenerator : ManifestGenerator
 
             var ai = epe.GetOrAdd(AsmV2 + "assemblyIdentity");
             var fi = new FileInfo(Path.Combine(FromDirectory.FullName, path));
-            var name = AssemblyName.GetAssemblyName(fi.FullName);
-            ai.SetAttributeValue("name", name.Name);
+            var name = GetAssemblyName(fi.FullName);
+            ai.SetAttributeValue("name", Path.GetFileName(name.Name));
             ai.SetAttributeValue("version", name.Version.ToString());
             SetAssemblyAttributes(ai, name);
 
@@ -508,7 +529,7 @@ public class ApplicationManifestGenerator : ManifestGenerator
 
     protected virtual XElement CreateDependencyElement(FileInfo file, string path)
     {
-        var name = AssemblyName.GetAssemblyName(file.FullName);
+        var name = GetAssemblyName(file.FullName);
 
         var dep = new XElement(AsmV2 + "dependency");
 
