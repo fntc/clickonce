@@ -181,7 +181,7 @@ public abstract class ManifestGenerator
         ai.SetAttributeValue("publicKeyToken", name.GetPublicKeyToken().ToAttributeValue());
         ai.SetAttributeValue(
             "processorArchitecture",
-            name.ProcessorArchitecture.ToAttributeValue());
+            name.Name.Equals("Launcher") ? "msil" : name.ProcessorArchitecture.ToAttributeValue());
     }
 
     protected void AddHashElement(XElement e, FileInfo f)
