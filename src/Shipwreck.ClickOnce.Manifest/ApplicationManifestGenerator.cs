@@ -223,7 +223,7 @@ public class ApplicationManifestGenerator : ManifestGenerator
             var name = AssemblyName.GetAssemblyName(fi.FullName);
 
             GetOrAddAssemblyIdentityElement(
-                name: EntryPointPath.Replace('/', '\\'),
+                name: Path.GetFileName(EntryPointPath.Replace('/', '\\')),
                 version: (Settings.Version ?? name.Version)?.ToString() ?? "1.0.0.0",
                 language: name.CultureName?.Length > 0 ? name.CultureName : "neutral",
                 processorArchitecture: name.ProcessorArchitecture.ToAttributeValue() ?? "msil",
