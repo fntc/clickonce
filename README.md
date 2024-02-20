@@ -1,5 +1,8 @@
 # Shipwreck.ClickOnce.Manifest
 
+Forked to test some adjustments for Avalonia on dotnet8 compatibility
+
+
 ClickOnce Manifest Generator.
 
 ## Usage
